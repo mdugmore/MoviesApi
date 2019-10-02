@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Movies.Core.Contract.Request;
 using Movies.Core.Entities;
 using Movies.Core.Interfaces;
+using Movies.Core.MovieProjections;
 using Movies.Domain.Common;
 using Movies.Domain.Contract.Response;
 
@@ -29,14 +30,14 @@ namespace Movies.Core.Services
                             && (string.IsNullOrEmpty(movieSearchRequest.Title) || m.Title.Contains(
                                     movieSearchRequest.Title,
                                     StringComparison.InvariantCultureIgnoreCase)))
-                .Select(MapToMovieResponse)
+                .Select(m => m.ToMovieResponse())
                 .ToList();
         }
 
         public IEnumerable<MovieResponse> GetTopRatedMovies(int count)
         {
             return _movieRepository.GetMovies()
-                .Select(MapToMovieResponse)
+                .Select(m => m.ToMovieResponse())
                 .OrderByDescending(m => m.AverageRating)
                 .ThenBy(m => m.Title)
                 .Take(count)
@@ -47,7 +48,7 @@ namespace Movies.Core.Services
         {
             return _movieRepository.GetMovies()
                 .Where(m => m.UserRatings.Any(r => r.UserId == userId))
-                .Select(MapToMovieResponse)
+                .Select(m => m.ToMovieResponse())
                 .OrderByDescending(m => m.AverageRating)
                 .ThenBy(m => m.Title)
                 .Take(count)
@@ -87,18 +88,6 @@ namespace Movies.Core.Services
             return updateRatingResponse;
         }
 
-        private static MovieResponse MapToMovieResponse(Movie movie)
-        {
-            return new MovieResponse
-            {
-                Id = movie.MovieId,
-                AverageRating = movie.UserRatings != null && movie.UserRatings.Any()
-                    ? movie.UserRatings.Average(r => r.Rating)
-                    : (double?) null,
-                RunningTime = movie.RunningTimeInMinutes,
-                Title = movie.Title,
-                YearOfRelease = movie.ReleaseDate.Year
-            };
-        }
+        
     }
 }
