@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/.vs/Movies.Api/v16/Server/sqlite3
+/.vs
+/src/Movies.Api/obj
+/src/Movies.Core/obj
+/src/Movies.Infrastructure/obj
